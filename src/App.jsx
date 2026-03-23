@@ -8,7 +8,7 @@ function App() {
   const [page, setPage] = useState(1)
   const [selectedCard, setSelectedCard] = useState(null)
 
-  const { data, error, isLoading } = useGetCardsQuery({
+  const { data, error, isLoading, isFetching } = useGetCardsQuery({
     name: search,
     type: type,
     page: page,
@@ -34,7 +34,7 @@ function App() {
     <div style={{margin: '20px 0', textAlign: 'center'}}>
       <button
         onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-        disabled={page === 1 || isLoading}
+        disabled={page === 1 || isLoading || isFetching}
         style={{
           padding: '8px',
           margin: '0 5px',
@@ -51,7 +51,7 @@ function App() {
 
       <button
         onClick={() => setPage((prev) => prev + 1)}
-        disabled={!data || data.data.length < 20 || isLoading}
+        disabled={!data || data.data.length < 20 || isLoading || isFetching}
 
         style={{
           padding: '8px',
@@ -91,17 +91,21 @@ function App() {
         gap: '10px',
         marginBottom: '20px'
       }}>
+
         {/*SEARCH*/}
-        <div style={{ marginBottom: '20px' }}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSearch()
+          }}
+        >
+          
           <input
             type="text"
             placeholder="Search Pokémon..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch()
-            }}
-          
+
           style={{
             padding: '8px',
             marginRight: '10px',
@@ -123,7 +127,7 @@ function App() {
           >
             Search
           </button>
-        </div>
+        </form>
         
         {/*FILTER*/}
         <div 
@@ -162,7 +166,7 @@ function App() {
 
       {/*LOADING SCREEN*/}
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
-        {isLoading && <p>Loading Pokémon Cards...</p>}
+        {isLoading || isFetching && <p>Loading Pokémon Cards...</p>}
       </div>
 
       {/*CARD*/}
