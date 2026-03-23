@@ -30,19 +30,36 @@ function App() {
   ]
 
   const Pagination = () => (
-    <div style={{ margin: '20px 0', textAlign: 'center' }}>
+    <div style={{margin: '20px 0', textAlign: 'center'}}>
       <button
         onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
         disabled={page === 1 || isLoading}
+        style={{
+          padding: '8px',
+          margin: '0 5px',
+          backgroundColor: '#333',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer'
+        }}
       >
         Previous
       </button>
 
-      <span style={{ margin: '0 10px' }}>Page {page}</span>
+      <span style={{margin: '0 10px'}}>Page {page}</span>
 
       <button
         onClick={() => setPage((prev) => prev + 1)}
         disabled={!data || data.data.length < 20 || isLoading}
+
+        style={{
+          padding: '8px',
+          margin: '0 5px',
+          backgroundColor: '#333',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer'
+        }}
       >
         Next
       </button>
@@ -50,34 +67,66 @@ function App() {
     )
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Pokemon TCG Viewer</h1>
+    <div style={{
+        padding: '20px',
+        backgroundColor: '#121212',
+        color: '#ffffff',
+        minHeight: '100vh'
+      }}>
 
-      {/*SEARCH*/}
-      <div style={{ marginBottom: '20px' }}>
-        <input
-          type="text"
-          placeholder="Search Pokemon..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSearch()
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        Pokémon TCG Viewer
+      </h1>
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '10px',
+        marginBottom: '20px'
+      }}>
+        {/*SEARCH*/}
+        <div style={{ marginBottom: '20px' }}>
+          <input
+            type="text"
+            placeholder="Search Pokémon..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSearch()
+            }}
+          
+          style={{
+            padding: '8px',
+            marginRight: '10px',
+            backgroundColor: '#1e1e1e',
+            color: '#fff',
+            border: '1px solid #444'
           }}
-        />
+          />
 
-        <button onClick={handleSearch}>Search</button>
+          <button onClick={handleSearch}>Search</button>
+        </div>
+        
+        {/*FILTER*/}
+        <div 
+        style={{
+          marginBottom: '20px',
+          padding: '8px',
+          backgroundColor: '#1e1e1e',
+          color: '#fff',
+          border: '1px solid #444'
+        }}
+        >
+          <select onChange={(e) => handleTypeChange(e.target.value)}>
+            <option value="">All Types</option>
+            {pokemonTypes.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
       </div>
-      
-      {/*FILTER*/}
-      <div style={{ marginBottom: '20px' }}>
-        <select onChange={(e) => handleTypeChange(e.target.value)}>
-          <option value="">All Types</option>
-          {pokemonTypes.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </div>
-      
+
       <Pagination />
 
       {/*LOADING SCREEN*/}
