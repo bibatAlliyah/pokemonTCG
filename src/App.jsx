@@ -5,14 +5,22 @@ function App() {
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch] = useState('')
   const [type, setType] = useState('')
+  const [page, setPage] = useState(1)
 
   const { data, error, isLoading } = useGetCardsQuery({
     name: search,
     type: type,
+    page: page,
   })
 
   const handleSearch = () => {
+    setPage(1)
     setSearch(inputValue)
+  }
+
+  const handleTypeChange = (value) => {
+  setPage(1)
+  setType(value)
   }
 
   const pokemonTypes = [
@@ -22,20 +30,11 @@ function App() {
   ]
 
   /*loading screen*/
-      if(isLoading){
-        return (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            flexDirection: 'column'
-          }}>
-            <div className="spinner"></div>
-            <p>Loading Pokémon cards...</p>
-          </div>
-        )
-      }
+      {isLoading && (
+        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <p>Loading Pokémon Cards...</p>
+        </div>
+      )}
 
   return (
     <div style={{ padding: '20px' }}>
@@ -47,6 +46,11 @@ function App() {
           placeholder="Search Pokemon..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch()
+            }
+          }}
         />
 
         <button onClick={handleSearch}>
@@ -55,7 +59,7 @@ function App() {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <select onChange={(e) => setType(e.target.value)}>
+        <select onChange={(e) => handleTypeChange(e.target.value)}>
           <option value="">All Types</option>
           {pokemonTypes.map((t) => (
             <option key={t} value={t}>{t}</option>
@@ -94,6 +98,23 @@ function App() {
           </div>
         ))}
       </div>
+
+      <div style={{ marginTop: '20px', textAlign: 'center' }}></div>
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+
+        <span style={{ margin: '0 10px' }}>Page {page}</span>
+
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          disabled={!data || data.data.length < 20}
+        >
+          Next
+        </button>
     </div>
   )
 }

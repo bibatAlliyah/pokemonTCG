@@ -7,13 +7,13 @@ export const pokemonApi = createApi({
   }),
   endpoints: (builder) => ({
     getCards: builder.query({
-        query: ({name = '', type = ''}) => {
-            let query = []
+        query: ({ name = '', type = '', page = 1 }) => {
+        let query = []
 
-            if (name) query.push(`name:${name}`)
-            if (type) query.push(`types:${type}`)
+        if (name) query.push(`name:${name}`)
+        if (type) query.push(`types:${type}`)
 
-            return `cards?q=${query.join(' ')}`
+        return `cards?page=${page}&pageSize=20&q=${query.join(' ')}`
         },
     }),
   }),
