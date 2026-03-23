@@ -135,10 +135,24 @@ function App() {
           border: '1px solid #444'
         }}
         >
-          <select onChange={(e) => handleTypeChange(e.target.value)}>
+          <select
+            onChange={(e) => handleTypeChange(e.target.value)}
+            style={{
+              padding: '8px',
+              backgroundColor: '#1e1e1e',
+              color: '#fff',
+              border: '1px solid #444'
+            }}
+          >
             <option value="">All Types</option>
             {pokemonTypes.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option 
+              key={t}
+              value={t}
+              style={{ backgroundColor: '#1e1e1e', color: '#fff' }}
+              >
+                {t}
+              </option>
             ))}
           </select>
         </div>
@@ -232,20 +246,38 @@ function App() {
               <p><strong>HP:</strong> {selectedCard.hp}</p>
               <p><strong>Type:</strong> {selectedCard.types?.join(', ')}</p>
 
-              <p><strong>Abilities:</strong></p>
-              {selectedCard.abilities?.map((a, i) => (
-                <p key={i}>{a.name}: {a.text}</p>
-              ))}
+              {selectedCard.abilities && (
+                <>
+                  <p><strong>Abilities:</strong></p>
+                  {selectedCard.abilities.map((a, i) => (
+                    <p key={i}>{a.name}: {a.text}</p>
+                  ))}
+                </>
+              )}
 
-              <p><strong>Attacks:</strong></p>
-              {selectedCard.attacks?.map((atk, i) => (
-                <p key={i}>
-                  {atk.name} ({atk.damage}) - {atk.text}
-                </p>
-              ))}
+              {selectedCard.attacks && (
+                <>
+                  <p><strong>Attacks:</strong></p>
+                  {selectedCard.attacks.map((atk, i) => (
+                    <p key={i}>
+                      {atk.name} ({atk.damage}) - {atk.text}
+                    </p>
+                  ))}
+                </>
+              )}
 
-              <p><strong>Flavor:</strong></p>
-              <p>{selectedCard.flavorText}</p>
+              {selectedCard.flavorText && (
+                <>
+                  <div style={{
+                    margin: '10px 0',
+                    borderTop: '2px dashed #ffcb05'
+                  }}></div>
+
+                  <p style={{ fontStyle: 'italic' }}>
+                    {selectedCard.flavorText}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
