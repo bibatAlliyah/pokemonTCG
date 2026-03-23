@@ -6,6 +6,7 @@ function App() {
   const [search, setSearch] = useState('')
   const [type, setType] = useState('')
   const [page, setPage] = useState(1)
+  const [selectedCard, setSelectedCard] = useState(null)
 
   const { data, error, isLoading } = useGetCardsQuery({
     name: search,
@@ -74,7 +75,12 @@ function App() {
         minHeight: '100vh'
       }}>
 
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+      <h1 
+      style={{
+        textAlign: 'center',
+        marginBottom: '20px',
+        fontFamily: "'Press Start 2P', sans-serif",
+      }}>
         Pokémon TCG Viewer
       </h1>
 
@@ -105,7 +111,18 @@ function App() {
           }}
           />
 
-          <button onClick={handleSearch}>Search</button>
+          <button 
+          onClick={handleSearch}
+          style={{
+            padding: '8px',
+            marginRight: '10px',
+            backgroundColor: '#1e1e1e',
+            color: '#fff',
+            border: '1px solid #444'
+          }}
+          >
+            Search
+          </button>
         </div>
         
         {/*FILTER*/}
@@ -144,6 +161,7 @@ function App() {
         {data?.data?.map((card) => (
           <div 
             key={card.id} 
+            onClick={() => setSelectedCard(card)}
             style={{
               textAlign: 'center',
               transition: 'transform 0.2s'
@@ -167,6 +185,71 @@ function App() {
       </div>
 
       <Pagination />
+      
+      {/*POPUP*/}
+      {selectedCard && (
+        <div
+          onClick={() => setSelectedCard(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1e1e1e',
+              padding: '20px',
+              borderRadius: '10px',
+              display: 'flex',
+              gap: '20px',
+              maxWidth: '900px',
+              width: '90%'
+            }}
+          >
+
+            {/*IMAGE*/}
+            <div>
+              <img
+                src={selectedCard.images.large}
+                alt={selectedCard.name}
+                style={{ width: '300px' }}
+              />
+            </div>
+
+            {/*DETAILS*/}
+            <div style={{ color: '#fff' }}>
+              <h2>{selectedCard.name}</h2>
+
+              <p><strong>HP:</strong> {selectedCard.hp}</p>
+              <p><strong>Type:</strong> {selectedCard.types?.join(', ')}</p>
+
+              <p><strong>Abilities:</strong></p>
+              {selectedCard.abilities?.map((a, i) => (
+                <p key={i}>{a.name}: {a.text}</p>
+              ))}
+
+              <p><strong>Attacks:</strong></p>
+              {selectedCard.attacks?.map((atk, i) => (
+                <p key={i}>
+                  {atk.name} ({atk.damage}) - {atk.text}
+                </p>
+              ))}
+
+              <p><strong>Flavor:</strong></p>
+              <p>{selectedCard.flavorText}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
