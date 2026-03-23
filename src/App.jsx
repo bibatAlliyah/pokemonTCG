@@ -29,17 +29,31 @@ function App() {
     'Dragon', 'Colorless'
   ]
 
-  /*loading screen*/
-      {isLoading && (
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <p>Loading Pokémon Cards...</p>
-        </div>
-      )}
+  const Pagination = () => (
+    <div style={{ margin: '20px 0', textAlign: 'center' }}>
+      <button
+        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+        disabled={page === 1 || isLoading}
+      >
+        Previous
+      </button>
+
+      <span style={{ margin: '0 10px' }}>Page {page}</span>
+
+      <button
+        onClick={() => setPage((prev) => prev + 1)}
+        disabled={!data || data.data.length < 20 || isLoading}
+      >
+        Next
+      </button>
+    </div>
+    )
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>Pokemon TCG Viewer</h1>
 
+      {/*SEARCH*/}
       <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
@@ -47,17 +61,14 @@ function App() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSearch()
-            }
+            if (e.key === 'Enter') handleSearch()
           }}
         />
 
-        <button onClick={handleSearch}>
-          Search
-        </button>
+        <button onClick={handleSearch}>Search</button>
       </div>
-
+      
+      {/*FILTER*/}
       <div style={{ marginBottom: '20px' }}>
         <select onChange={(e) => handleTypeChange(e.target.value)}>
           <option value="">All Types</option>
@@ -66,8 +77,15 @@ function App() {
           ))}
         </select>
       </div>
+      
+      <Pagination />
 
-      {/*Card*/}
+      {/*LOADING SCREEN*/}
+      <div style={{ textAlign: 'center', margin: '20px 0' }}>
+        {isLoading && <p>Loading Pokémon Cards...</p>}
+      </div>
+
+      {/*CARD*/}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
@@ -99,22 +117,7 @@ function App() {
         ))}
       </div>
 
-      <div style={{ marginTop: '20px', textAlign: 'center' }}></div>
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-        >
-          Previous
-        </button>
-
-        <span style={{ margin: '0 10px' }}>Page {page}</span>
-
-        <button
-          onClick={() => setPage((prev) => prev + 1)}
-          disabled={!data || data.data.length < 20}
-        >
-          Next
-        </button>
+      <Pagination />
     </div>
   )
 }
