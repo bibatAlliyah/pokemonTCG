@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useGetCardsQuery } from './api/pokemonApi'
 
 function App() {
@@ -7,6 +7,9 @@ function App() {
   const [type, setType] = useState('')
   const [page, setPage] = useState(1)
   const [selectedCard, setSelectedCard] = useState(null)
+  const audioRef = useRef(null)
+  const [volume, setVolume] = useState(0.3)
+  const [hasPlayed, setHasPlayed] = useState(false)
 
   const { data, error, isLoading, isFetching } = useGetCardsQuery({
     name: search,
@@ -18,6 +21,16 @@ function App() {
     setPage(1)
     setSearch(inputValue)
   }
+
+  const playMusic = () => {
+  if (audioRef.current && !hasPlayed) {
+    audioRef.current.volume = volume
+    audioRef.current.play().catch(() => {
+      console.log('Autoplay blocked')
+    })
+    setHasPlayed(true)
+  }
+}
 
   const handleTypeChange = (value) => {
   setPage(1)
@@ -68,7 +81,9 @@ function App() {
     )
 
   return (
-    <div style={{
+    <div 
+      onClick={playMusic}
+      style={{
         padding: '20px',
         backgroundColor: '#121212',
         color: '#ffffff',
@@ -83,6 +98,60 @@ function App() {
       }}>
         Pokémon TCG Viewer
       </h1>
+
+      {/*BGM*/}
+      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <button
+          onClick={playMusic}
+          style={{
+            padding: '8px',
+            marginRight: '10px',
+            backgroundColor: '#333',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          ▶ Play BGM
+        </button>
+
+        <button
+          onClick={() => {
+            if (audioRef.current) {
+              audioRef.current.muted = !audioRef.current.muted
+            }
+          }}
+          style={{
+            padding: '8px',
+            marginRight: '10px',
+            backgroundColor: '#333',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          🔇 Mute
+        </button>
+        
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={(e) => {
+            const newVolume = Number(e.target.value)
+            setVolume(newVolume)
+            if (audioRef.current) {
+              audioRef.current.volume = newVolume
+            }
+          }}
+        />
+      </div>
+
+      <audio ref={audioRef} loop>
+        <source src="/bgm.mp3" type="audio/mpeg" />
+      </audio>
 
       <div style={{
         display: 'flex',
@@ -166,7 +235,7 @@ function App() {
 
       {/*LOADING SCREEN*/}
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
-        {isLoading || isFetching && <p>Loading Pokémon Cards...</p>}
+        {(isLoading || isFetching) && <p>Loading Pokémon Cards...</p>}
       </div>
 
       {/*CARD*/}
@@ -228,18 +297,24 @@ function App() {
               padding: '20px',
               borderRadius: '10px',
               display: 'flex',
+              flexDirection: window.innerWidth < 768 ? 'column' : 'row',
               gap: '20px',
               maxWidth: '900px',
-              width: '90%'
+              width: '90%',
+              maxHeight: '90vh',
+              overflowY: 'auto'
             }}
           >
 
             {/*IMAGE*/}
-            <div>
+            <div style={{ textAlign: 'center' }}>
               <img
                 src={selectedCard.images.large}
                 alt={selectedCard.name}
-                style={{ width: '300px' }}
+                style={{
+                  width: '100%',
+                  maxWidth: '300px'
+                }}
               />
             </div>
 
@@ -264,7 +339,9 @@ function App() {
                   <p><strong>Attacks:</strong></p>
                   {selectedCard.attacks.map((atk, i) => (
                     <p key={i}>
-                      {atk.name} ({atk.damage}) - {atk.text}
+                      {atk.name}
+                      {atk.damage && ` (${atk.damage})`}
+                      {atk.text && ` - ${atk.text}`}
                     </p>
                   ))}
                 </>
